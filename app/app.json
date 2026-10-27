@@ -1,0 +1,80 @@
+{
+  "expo": {
+    "name": "Chat Up",
+    "slug": "chat-up",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.chatup.app",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "NSCameraUsageDescription": "Chat Up needs the camera for video calls.",
+        "NSMicrophoneUsageDescription": "Chat Up needs the microphone for calls and voice notes.",
+        "ITSAppUseEncryptionExempt": false
+      },
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.chatup.app",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS"
+      ],
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4f46e5"
+      }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Chat Up needs your photos so you can send them.",
+          "cameraPermission": "Chat Up needs the camera so you can take photos and videos for your status."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Chat Up needs the microphone so you can send voice notes."
+        }
+      ],
+      "expo-notifications",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Chat Up shows your recent photos and videos so you can post them to your status.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Chat Up uses Face ID to unlock your locked chats."
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "SET-BY-DEVELOPER-WITH-eas-init"
+      }
+    },
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4f46e5"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
