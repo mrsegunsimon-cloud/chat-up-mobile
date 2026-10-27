@@ -1,0 +1,27 @@
+name: Build Android test app
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Put your Supabase details into the build settings
+        run: |
+          sed -i "s#PASTE_PROJECT_URL_HERE#${{ secrets.SUPABASE_URL }}#g; s#PASTE_PUBLISHABLE_KEY_HERE#${{ secrets.SUPABASE_KEY }}#g" eas.json
+      - run: npm install --legacy-peer-deps
+      - run: npx expo install --fix
+      - name: Link to your Expo project
+        run: eas init --non-interactive --force
+      - name: Build the Android test app (installable file)
+        run: eas build --platform android --profile preview --non-interactive

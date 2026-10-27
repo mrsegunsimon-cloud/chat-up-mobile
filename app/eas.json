@@ -27,6 +27,16 @@
         "EXPO_PUBLIC_SUPABASE_URL": "PASTE_PROJECT_URL_HERE",
         "EXPO_PUBLIC_SUPABASE_KEY": "PASTE_PUBLISHABLE_KEY_HERE"
       }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "PASTE_PROJECT_URL_HERE",
+        "EXPO_PUBLIC_SUPABASE_KEY": "PASTE_PUBLISHABLE_KEY_HERE"
+      }
     }
   },
   "submit": {
