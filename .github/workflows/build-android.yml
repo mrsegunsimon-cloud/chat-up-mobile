@@ -21,8 +21,27 @@ jobs:
         run: |
           sed -i "s#PASTE_PROJECT_URL_HERE#${{ secrets.SUPABASE_URL }}#g; s#PASTE_PUBLISHABLE_KEY_HERE#${{ secrets.SUPABASE_KEY }}#g" eas.json
       - run: npm install --legacy-peer-deps
-      - run: npx expo install --fix
+      - name: Match package versions to Expo
+        run: |
+          set +e
+          OUT=$(CI=1 npx expo install --fix 2>&1); CODE=$?
+          echo "$OUT" | tail -30
+          if [ $CODE -ne 0 ]; then echo "::error title=expo install failed::$(echo "$OUT" | tail -8 | tr '\n' ' ' | cut -c1-700)"; exit $CODE; fi
+      - name: Install packages
+        run: |
+          set +e
+          OUT=$(npm install --legacy-peer-deps 2>&1); CODE=$?
+          echo "$OUT" | tail -30
+          if [ $CODE -ne 0 ]; then echo "::error title=npm install failed::$(echo "$OUT" | tail -8 | tr '\n' ' ' | cut -c1-700)"; exit $CODE; fi
       - name: Link to your Expo project
-        run: eas init --non-interactive --force
+        run: |
+          set +e
+          OUT=$(eas init --non-interactive --force 2>&1); CODE=$?
+          echo "$OUT" | tail -30
+          if [ $CODE -ne 0 ]; then echo "::error title=eas init failed::$(echo "$OUT" | tail -8 | tr '\n' ' ' | cut -c1-700)"; exit $CODE; fi
       - name: Build the Android test app (installable file)
-        run: eas build --platform android --profile preview --non-interactive
+        run: |
+          set +e
+          OUT=$(eas build --platform android --profile preview --non-interactive 2>&1); CODE=$?
+          echo "$OUT" | tail -40
+          if [ $CODE -ne 0 ]; then echo "::error title=eas build failed::$(echo "$OUT" | tail -10 | tr '\n' ' ' | cut -c1-900)"; exit $CODE; fi
