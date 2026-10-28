@@ -49,20 +49,23 @@ jobs:
         if: failure()
         run: |
           set +e
-          eas build:list --platform android --limit 1 --json --non-interactive > /tmp/b.json 2>/dev/null
+          ID=$(eas build:list --platform android --limit 1 --json --non-interactive 2>/dev/null | python3 -c "import sys,json;print(json.load(sys.stdin)[0]['id'])")
+          eas build:view "$ID" --json > /tmp/b.json 2>/tmp/b.err
           python3 - <<'PY'
           import json,urllib.request,re
           try:
-              b=json.load(open('/tmp/b.json'))[0]
+              raw=open('/tmp/b.json').read()
+              b=json.loads(raw)
+              print('keys:',list(b.keys()))
               urls=b.get('logFiles') or []
+              print('logfiles:',len(urls))
               txt=''
               for u in urls:
                   txt+=urllib.request.urlopen(u,timeout=60).read().decode('utf8','ignore')
-              lines=[l for l in txt.splitlines() if re.search(r'error|Error|ERR|failed|Cannot|cannot|not found|missing|Missing',l)]
-              out=' | '.join(l.strip()[:200] for l in lines[-12:])
-              print('::error title=Expo build log::'+out[:1500])
-              print(txt[-4000:])
+              lines=[l for l in txt.splitlines() if re.search(r'rror|ERR|ailed|annot|ot found|issing|xception',l)]
+              out=' | '.join(l.strip()[:220] for l in lines[-10:]) or ('no matching lines; tail: '+txt[-600:].replace(chr(10),' | '))
+              print('::error title=Expo build log::'+out[:1700])
           except Exception as e:
-              print('::error title=Could not read the Expo log::'+str(e)[:300])
+              print('::error title=Could not read the Expo log::'+str(e)[:400]+' '+open('/tmp/b.err').read()[:300].replace(chr(10),' '))
           PY
         working-directory: app
