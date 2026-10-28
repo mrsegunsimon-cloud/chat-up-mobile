@@ -52,7 +52,7 @@ jobs:
           ID=$(eas build:list --platform android --limit 1 --json --non-interactive 2>/dev/null | python3 -c "import sys,json;print(json.load(sys.stdin)[0]['id'])")
           eas build:view "$ID" --json > /tmp/b.json 2>/tmp/b.err
           python3 - <<'PY'
-          import json,urllib.request,re
+          import json,urllib.request,re,zlib,gzip
           try:
               raw=open('/tmp/b.json').read()
               b=json.loads(raw)
@@ -61,10 +61,13 @@ jobs:
               print('logfiles:',len(urls))
               txt=''
               for u in urls:
-                  txt+=urllib.request.urlopen(u,timeout=60).read().decode('utf8','ignore')
+                  d=urllib.request.urlopen(u,timeout=60).read()
+                  try: d=gzip.decompress(d)
+                  except Exception: pass
+                  txt+=d.decode('utf8','ignore')
               lines=[l for l in txt.splitlines() if re.search(r'rror|ERR|ailed|annot|ot found|issing|xception',l)]
               out=' | '.join(l.strip()[:220] for l in lines[-10:]) or ('no matching lines; tail: '+txt[-600:].replace(chr(10),' | '))
-              print('::error title=Expo build log::'+out[:1700])
+              print('::error title=Expo build log::'+out[:1700]); print(txt[-3000:])
           except Exception as e:
               print('::error title=Could not read the Expo log::'+str(e)[:400]+' '+open('/tmp/b.err').read()[:300].replace(chr(10),' '))
           PY
