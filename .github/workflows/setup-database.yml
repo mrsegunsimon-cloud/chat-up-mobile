@@ -13,7 +13,14 @@ jobs:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           test -n "$DB_URL" || { echo "Missing the SUPABASE_DB_URL secret"; exit 1; }
-          psql "$DB_URL" --single-transaction -v ON_ERROR_STOP=1 -f app/supabase/ALL_IN_ONE.sql
+          set +e
+          OUT=$(psql "$DB_URL" --single-transaction -v ON_ERROR_STOP=1 -f app/supabase/ALL_IN_ONE.sql 2>&1)
+          CODE=$?
+          echo "$OUT" | tail -25
+          if [ $CODE -ne 0 ]; then
+            echo "::error title=SQL failed (code $CODE)::$(echo "$OUT" | tail -6 | tr '\n' ' ' | cut -c1-600)"
+            exit $CODE
+          fi
       - name: List the tables that now exist
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
