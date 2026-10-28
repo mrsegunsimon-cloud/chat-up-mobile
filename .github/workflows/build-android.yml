@@ -62,8 +62,15 @@ jobs:
               txt=''
               for u in urls:
                   d=urllib.request.urlopen(u,timeout=60).read()
-                  try: d=gzip.decompress(d)
-                  except Exception: pass
+                  print('magic',d[:4].hex(),len(d))
+                  for wb in (47,-15,15):
+                      try:
+                          d=zlib.decompress(d,wb); break
+                      except Exception: pass
+                  else:
+                      try:
+                          import brotli; d=brotli.decompress(d)
+                      except Exception: pass
                   txt+=d.decode('utf8','ignore')
               lines=[l for l in txt.splitlines() if re.search(r'rror|ERR|ailed|annot|ot found|issing|xception',l)]
               out=' | '.join(l.strip()[:220] for l in lines[-10:]) or ('no matching lines; tail: '+txt[-600:].replace(chr(10),' | '))
