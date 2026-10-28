@@ -72,9 +72,16 @@ jobs:
                           import brotli; d=brotli.decompress(d)
                       except Exception: pass
                   txt+=d.decode('utf8','ignore')
-              lines=[l for l in txt.splitlines() if re.search(r'rror|ERR|ailed|annot|ot found|issing|xception',l)]
-              out=' | '.join(l.strip()[:220] for l in lines[-10:]) or ('no matching lines; tail: '+txt[-600:].replace(chr(10),' | '))
-              print('::error title=Expo build log::'+out[:1700]); print(txt[-3000:])
+              msgs=[]
+              for l in txt.splitlines():
+                  try:
+                      o=json.loads(l); msgs.append((o.get('phase',''),str(o.get('msg',''))))
+                  except Exception:
+                      msgs.append(('',l))
+              print('lines',len(msgs),'urls',len(urls))
+              pre=[m for ph,m in msgs if 'PREBUILD' in str(ph).upper() or 'rror' in m]
+              out=' | '.join(m.strip()[:300] for m in (pre or [m for _,m in msgs])[-8:])
+              print('::error title=Expo build log::'+out[:1700])
           except Exception as e:
               print('::error title=Could not read the Expo log::'+str(e)[:400]+' '+open('/tmp/b.err').read()[:300].replace(chr(10),' '))
           PY
