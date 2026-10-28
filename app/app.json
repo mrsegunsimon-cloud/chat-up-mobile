@@ -62,11 +62,6 @@
       ],
       "expo-secure-store"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "SET-BY-DEVELOPER-WITH-eas-init"
-      }
-    },
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
