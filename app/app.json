@@ -24,11 +24,7 @@
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS"
       ],
-      "versionCode": 1,
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#4f46e5"
-      }
+      "versionCode": 1
     },
     "plugins": [
       [
@@ -62,12 +58,6 @@
       ],
       "expo-secure-store"
     ],
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#4f46e5"
-    },
     "runtimeVersion": {
       "policy": "appVersion"
     }
