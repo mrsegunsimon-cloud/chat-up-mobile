@@ -45,3 +45,24 @@ jobs:
           OUT=$(eas build --platform android --profile preview --non-interactive 2>&1); CODE=$?
           echo "$OUT" | tail -40
           if [ $CODE -ne 0 ]; then echo "::error title=eas build failed::$(echo "$OUT" | tail -10 | tr '\n' ' ' | cut -c1-900)"; exit $CODE; fi
+      - name: Fetch the Expo build log when the build fails
+        if: failure()
+        run: |
+          set +e
+          eas build:list --platform android --limit 1 --json --non-interactive > /tmp/b.json 2>/dev/null
+          python3 - <<'PY'
+          import json,urllib.request,re
+          try:
+              b=json.load(open('/tmp/b.json'))[0]
+              urls=b.get('logFiles') or []
+              txt=''
+              for u in urls:
+                  txt+=urllib.request.urlopen(u,timeout=60).read().decode('utf8','ignore')
+              lines=[l for l in txt.splitlines() if re.search(r'error|Error|ERR|failed|Cannot|cannot|not found|missing|Missing',l)]
+              out=' | '.join(l.strip()[:200] for l in lines[-12:])
+              print('::error title=Expo build log::'+out[:1500])
+              print(txt[-4000:])
+          except Exception as e:
+              print('::error title=Could not read the Expo log::'+str(e)[:300])
+          PY
+        working-directory: app
