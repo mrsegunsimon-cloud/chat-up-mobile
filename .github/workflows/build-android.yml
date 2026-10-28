@@ -1,6 +1,8 @@
 name: Build Android test app
 on:
   workflow_dispatch:
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,10 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Install the build tool
+        run: npm install -g eas-cli
+        working-directory: .
       - name: Put your Supabase details into the build settings
         run: |
           sed -i "s#PASTE_PROJECT_URL_HERE#${{ secrets.SUPABASE_URL }}#g; s#PASTE_PUBLISHABLE_KEY_HERE#${{ secrets.SUPABASE_KEY }}#g" eas.json
